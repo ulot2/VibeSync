@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Home } from "@/components/Home";
+import { Capture } from "@/components/Capture";
+import { Analyzing } from "@/components/Analyzing";
+import { Result } from "@/components/Result";
 
-export default function Home() {
+export default function Page() {
   const [image, setImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [weather, setWeather] = useState<any>(null);
+  const [view, setView] = useState<"home" | "capture" | "analyzing" | "result">(
+    "home"
+  );
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -25,76 +31,68 @@ export default function Home() {
     }
   }, []);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAnalyze = async (base64: string) => {
+    setImage(base64);
+    setView("analyzing");
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64 }),
+      });
+      const data = await response.json();
+      setTags(data.tags || []);
+
+      setTimeout(() => {
+        setView("result");
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to analyze", error);
+      setView("capture");
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = async (e) => {
+      reader.onload = (e) => {
         const base64 = e.target?.result as string;
-        setImage(base64);
-        setLoading(true);
-
-        try {
-          const response = await fetch("/api/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: base64 }),
-          });
-          const data = await response.json();
-          setTags(data.tags || []);
-        } catch (error) {
-          console.error("Failed to analyze", error);
-        } finally {
-          setLoading(false);
-        }
+        handleAnalyze(base64);
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const handleRestart = () => {
+    setImage(null);
+    setTags([]);
+    setView("home");
+  };
+
   return (
-    <div className="min-h-dvh bg-linear-to-br from-gray-900 to-black text-white flex flex-col items-center justify-center p-4">
-      {weather && (
-        <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full text-white text-sm">
-          {weather.temp}°C • {weather.description}
-        </div>
+    <div className="min-h-dvh bg-slate-900 text-white font-sans">
+      {view === "home" && <Home onStart={() => setView("capture")} />}
+
+      {view === "capture" && (
+        <Capture
+          onBack={() => setView("home")}
+          onImageUpload={handleImageUpload}
+          onCapture={handleAnalyze}
+        />
       )}
-      <label
-        htmlFor="image"
-        className="w-64 h-64 border-2 border-white/20 border-dashed rounded-3xl flex flex-col items-center justify-center cursor-pointer bg-white/5 active:scale-95 text-gray-400"
-      >
-        {image ? (
-          <img
-            src={image}
-            alt=""
-            className="w-full h-full object-cover rounded-2xl"
-          />
-        ) : (
-          <p className="text-gray-400">Upload Image</p>
-        )}
-      </label>
-      {loading && (
-        <p className="animate-pulse text-white mt-4">Analyzing vibes...</p>
+
+      {view === "analyzing" && <Analyzing tags={tags} weather={weather} />}
+
+      {view === "result" && (
+        <Result
+          image={image}
+          tags={tags}
+          weather={weather}
+          onRestart={handleRestart}
+        />
       )}
-      <div className="flex flex-wrap gap-2 mt-4 max-w-md justify-center">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="px-3 py-1 bg-white/10 rounded-full text-sm text-white backdrop-blur-md"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      <input
-        type="file"
-        name="image"
-        id="image"
-        accept="image/*"
-        capture="environment"
-        onChange={handleImageUpload}
-        className="hidden"
-      />
     </div>
   );
 }
