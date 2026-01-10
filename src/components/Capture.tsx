@@ -54,7 +54,7 @@ export function Capture({ onBack, onImageUpload, onCapture }: CaptureProps) {
       </div>
 
       {/* Viewfinder Area */}
-      <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-slate-900">
+      <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-black">
         <Webcam
           audio={false}
           ref={webcamRef}
