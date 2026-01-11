@@ -13,19 +13,13 @@ export function Home({ onStart }: HomeProps) {
         <ThemeToggle />
       </div>
 
-      {/* Background Ambient Glow */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 blur-3xl rounded-full animate-pulse dark:bg-primary/10" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500/20 blur-3xl rounded-full dark:bg-blue-600/10" />
-
       {/* Icon */}
       <div className="relative mb-8 transform hover:scale-105 transition-transform duration-500">
         <Camera className="w-24 h-24 text-foreground" strokeWidth={1.5} />
         <Sparkles className="absolute -top-2 -right-2 w-10 h-10 text-primary animate-bounce" />
       </div>
 
-      <h1 className="text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-primary/80">
-        VibeSync
-      </h1>
+      <h1 className="text-5xl font-bold mb-2 text-foreground">VibeSync</h1>
       <p className="text-xl text-muted-foreground mb-8 font-light tracking-wide">
         Environment-Aware Music
       </p>

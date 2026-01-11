@@ -8,10 +8,6 @@ interface AnalyzingProps {
 export function Analyzing({ tags, weather }: AnalyzingProps) {
   return (
     <div className="h-dvh flex flex-col items-center justify-center bg-background relative overflow-hidden transition-colors duration-300">
-      {/* Background Ambient Glow */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 blur-3xl rounded-full animate-pulse dark:bg-primary/10" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500/20 blur-3xl rounded-full dark:bg-blue-600/10" />
-
       {/* Pulsing Core */}
       <div className="relative mb-12">
         <div className="absolute inset-0 bg-primary blur-3xl animate-pulse opacity-30"></div>

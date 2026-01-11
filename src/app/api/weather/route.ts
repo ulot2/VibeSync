@@ -38,6 +38,7 @@ export async function GET(request: Request) {
       temp: Math.round(data.main.temp),
       weather: data.weather[0].main,
       description: data.weather[0].description,
+      name: data.name,
     });
   } catch (error) {
     console.error("Weather API Error:", error);
